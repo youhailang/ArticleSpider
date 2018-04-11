@@ -50,5 +50,6 @@ class JobboleSpider(scrapy.Spider):
     tags = ','.join(tag_list)
 
   def parse(self, response):
-    self.parse_by_xpath(response)
+    post_urls = response.css('#archive .floated-thumb .post-thumb a::attr(href)')
+  # self.parse_by_xpath( response)
     pass
