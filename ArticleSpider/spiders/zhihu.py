@@ -124,20 +124,39 @@ class ZhihuSpider(scrapy.Spider):
       xsrf = (match_obj.group(1))
 
     if xsrf:
-      post_url = "https://www.zhihu.com/login/phone_num"
       post_data = {
         "_xsrf": xsrf,
         "phone_num": zhihu_account()[0],
         "password": zhihu_account()[1],
         "captcha": "",
       }
+      import time
+      t = str(int(time.time() * 1000))
+      captcha_url = "https://www.zhihu.com/captcha.gif?r={0}&type=login".format(t)
+      yield scrapy.Request(captcha_url, headers=self.headers, meta={'post_data': post_data},
+                           callback=self.login_after_captcha)
 
-      return [scrapy.FormRequest(
-        url=post_url,
-        formdata=post_data,
-        headers=self.headers,
-        callback=self.check_login
-      )]
+  def login_after_captcha(self, response):
+    with open("captcha.jpg", "wb") as f:
+      f.write(t.content)
+      f.close()
+    from PIL import Image
+    try:
+      im = Image.open("captcha.jpg")
+      im.show()
+      im.close()
+    except:
+      pass
+    captcha = input("请输入验证码\n>")
+    post_data = response.meta.get("post_data", {})
+    post_url = "https://www.zhihu.com/login/phone_num"
+    post_data["captcha"] = captcha
+    return [scrapy.FormRequest(
+      url=post_url,
+      formdata=post_data,
+      headers=self.headers,
+      callback=self.check_login
+    )]
 
   def check_login(self, response):
     # 验证服务器的返回数据判断是否成功

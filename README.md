@@ -17,3 +17,6 @@ django scrapy item
 
 
 pip install requests -i https://pypi.douban.com/simple/
+倒立文字识别
+zheye
+https://github.com/muchrooms/zheye
