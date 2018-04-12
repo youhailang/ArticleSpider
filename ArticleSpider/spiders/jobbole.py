@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 import re
+from urllib import parse
 
 import scrapy
+from scrapy import Request
+
+from ArticleSpider.items import JobBoleArticleItem, ArticleItemLoader
+from ArticleSpider.utils.commom import get_md5
 
 
 class JobboleSpider(scrapy.Spider):
   name = 'jobbole'
   allowed_domains = ['blog.jobbole.com']
-  start_urls = ['http://blog.jobbole.com/113789/']
+  start_urls = ['http://blog.jobbole.com/all-posts/']
 
   def parse_by_xpath(self, response):
     # 标题
@@ -49,7 +54,28 @@ class JobboleSpider(scrapy.Spider):
     tag_list = [element for element in tag_list if not element.strip().endswith('评论')]
     tags = ','.join(tag_list)
 
+  def parse_detail(self, response):
+    item_loader = ArticleItemLoader(item=JobBoleArticleItem(), response=response)
+    # 通过item loader加载item
+    front_image_url = response.meta.get("front_image_url", "")  # 文章封面图
+    item_loader.add_css("title", ".entry-header h1::text")
+    item_loader.add_value("url", response.url)
+    item_loader.add_value("url_object_id", get_md5(response.url))
+    item_loader.add_css("create_date", "p.entry-meta-hide-on-mobile::text")
+    item_loader.add_value("front_image_url", [front_image_url])
+    item_loader.add_css("praise_nums", ".vote-post-up h10::text")
+    item_loader.add_css("comment_nums", "a[href='#article-comment'] span::text")
+    item_loader.add_css("fav_nums", ".bookmark-btn::text")
+    item_loader.add_css("tags", "p.entry-meta-hide-on-mobile a::text")
+    item_loader.add_css("content", "div.entry")
+    yield item_loader.load_item()
+
   def parse(self, response):
-    post_urls = response.css('#archive .floated-thumb .post-thumb a::attr(href)')
-  # self.parse_by_xpath( response)
-    pass
+    # 文章列表
+    post_nodes = response.css('#archive .floated-thumb .post-thumb a')
+    for post_node in post_nodes:
+      print(post_node)
+      front_image_url = parse.urljoin(response.url, post_node.css('img::attr(src)').extract_first(""))
+      post_url = parse.urljoin(response.url, post_node.css('::attr(href)').extract_first(""))
+      yield Request(url=post_url, meta={"front_image_url": [front_image_url]}, callback=self.parse_detail)
+    # 获取下一页

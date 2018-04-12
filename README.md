@@ -9,3 +9,5 @@ ROBOTSTXT_OBEY = False
 
 调试单个url
 scrapy shell http://blog.jobbole.com/113789/
+
+pip install pillow -i https://pypi.douban.com/simple/
