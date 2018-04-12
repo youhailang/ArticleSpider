@@ -78,4 +78,7 @@ class JobboleSpider(scrapy.Spider):
       front_image_url = parse.urljoin(response.url, post_node.css('img::attr(src)').extract_first(""))
       post_url = parse.urljoin(response.url, post_node.css('::attr(href)').extract_first(""))
       yield Request(url=post_url, meta={"front_image_url": [front_image_url]}, callback=self.parse_detail)
-    # 获取下一页
+    # 提取下一页并重新解析文章
+    # next_url = response.css(".next.page-numbers::attr(href)").extract_first("")
+    # if next_url:
+    #   yield Request(url=parse.urljoin(response.url, next_url), callback=self.parse)

@@ -122,8 +122,8 @@ class MysqlTwistedPipeline(object):
   def do_insert(self, cursor, item):
     # 异步插入参数
     insert_sql = """
-    insert into jobbole_article(title,url,url_object_id,comment_nums,fav_nums)
-    values (%s,%s,%s,%s,%s)
+    insert into jobbole_article(title,create_date,url,url_object_id,front_image_url,front_image_path,comment_nums,fav_nums,praise_nums,tags,content)
+    values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
     cursor.execute(insert_sql, (
-      item['title'], item['url'], item['url_object_id'], item['comment_nums'], item['fav_nums']))
+      item['title'], item['create_date'], item['url'], item['url_object_id'], item['front_image_url'],item['front_image_path'],item['comment_nums'], item['fav_nums'], item['praise_nums'], item['tags'], item['content']))
