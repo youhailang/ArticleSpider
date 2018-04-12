@@ -11,6 +11,8 @@ import json
 import MySQLdb
 from scrapy.exporters import JsonItemExporter
 from scrapy.pipelines.images import ImagesPipeline
+from twisted.enterprise import adbapi
+import MySQLdb.cursors
 
 
 class CJsonEncoder(json.JSONEncoder):
@@ -67,7 +69,7 @@ class JsonExporterPipleline(object):
     return item
 
 
-# 存储到数据库
+# 同步存储到数据库
 class MysqlPipeline(object):
   def __init__(self):
     # UnicodeEncodeError: 'latin-1' codec can't encode characters in position 0-7: ordinal not in range(256)
@@ -84,3 +86,44 @@ class MysqlPipeline(object):
       item['title'], item['url'], item['url_object_id'], item['comment_nums'], item['fav_nums']))
     self.conn.commit()
     return item
+
+  def close_spider(self, spider):
+    self.conn.commit()
+    self.conn.close()
+
+
+# 异步存储到数据库
+class MysqlTwistedPipeline(object):
+
+  def __init__(self, dbpool):
+    self.dbpool = dbpool
+
+  @classmethod
+  def from_settings(cls, settings):
+    dbparams = dict(host=settings['MYSQL_HOST'],
+                    db=settings['MYSQL_DB'],
+                    user=settings['MYSQL_USER'],
+                    passwd=settings['MYSQL_PASS'],
+                    charset='utf8',
+                    cursorclass=MySQLdb.cursors.DictCursor,
+                    use_unicode=True, )
+    dbpool = adbapi.ConnectionPool("MySQLdb", **dbparams)
+    return cls(dbpool)
+
+  def process_item(self, item, spider):
+    query = self.dbpool.runInteraction(self.do_insert, item)
+    query.addErrback(self.handle_error)  # 处理异步异常
+    return item
+
+  def handle_error(self, failure, item, spider):
+    # 处理异步插入异常
+    print(failure)
+
+  def do_insert(self, cursor, item):
+    # 异步插入参数
+    insert_sql = """
+    insert into jobbole_article(title,url,url_object_id,comment_nums,fav_nums)
+    values (%s,%s,%s,%s,%s)
+    """
+    cursor.execute(insert_sql, (
+      item['title'], item['url'], item['url_object_id'], item['comment_nums'], item['fav_nums']))
