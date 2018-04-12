@@ -20,3 +20,7 @@ pip install requests -i https://pypi.douban.com/simple/
 倒立文字识别
 zheye
 https://github.com/muchrooms/zheye
+selenium
+pip install -i https://pypi.douban.com/simple/ selenium
+
+http://selenium-python.readthedocs.io/installation.html

@@ -9,7 +9,7 @@ except:
   import http.cookiejar as cookielib
 
 import re
-from common import zhihu_account
+import common
 
 session = requests.session()
 session.cookies = cookielib.LWPCookieJar(filename="cookies.txt")
@@ -99,6 +99,6 @@ def zhihu_login(account, password):
   session.cookies.save()
 
 
-zhihu_login(zhihu_account()[0], zhihu_account()[1])
+zhihu_login(common.zhihu_user, common.zhihu_pass)
 # get_index()
 print(is_login())

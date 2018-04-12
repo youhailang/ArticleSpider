@@ -8,7 +8,7 @@ except:
   from urllib import parse
 import scrapy
 from scrapy.loader import ItemLoader
-from ArticleSpider.utils.common import zhihu_account
+import common
 
 
 class ZhihuSpider(scrapy.Spider):
@@ -126,8 +126,8 @@ class ZhihuSpider(scrapy.Spider):
     if xsrf:
       post_data = {
         "_xsrf": xsrf,
-        "phone_num": zhihu_account()[0],
-        "password": zhihu_account()[1],
+        "phone_num": common.zhihu_user,
+        "password": common.zhihu_pass,
         "captcha": "",
       }
       import time
