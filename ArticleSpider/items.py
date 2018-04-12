@@ -28,7 +28,6 @@ def get_nums(value):
     nums = int(match_re.group(1))
   else:
     nums = 0
-
   return nums
 
 
@@ -45,7 +44,6 @@ class ArticleItemLoader(ItemLoader):
 
 
 # 伯乐在线对应Item
-
 class JobBoleArticleItem(scrapy.Item):
   title = scrapy.Field()
   create_date = scrapy.Field(

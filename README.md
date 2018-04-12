@@ -11,3 +11,4 @@ ROBOTSTXT_OBEY = False
 scrapy shell http://blog.jobbole.com/113789/
 
 pip install pillow -i https://pypi.douban.com/simple/
+pip install mysqlclient -i https://pypi.douban.com/simple/
