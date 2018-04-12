@@ -68,6 +68,7 @@ ITEM_PIPELINES = {
   'ArticleSpider.pipelines.ArticlespiderPipeline': 300,
   # 'scrapy.pipelines.images.ImagesPipeline': 1,
   'ArticleSpider.pipelines.ArticlesImagePipeline': 1,
+  'ArticleSpider.pipelines.JsonWithEncodingPipeline': 2,
 }
 
 IMAGES_URLS_FIELD = "front_image_url"
