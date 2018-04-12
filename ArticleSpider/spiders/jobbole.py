@@ -6,7 +6,7 @@ import scrapy
 from scrapy import Request
 
 from ArticleSpider.items import JobBoleArticleItem, ArticleItemLoader
-from ArticleSpider.utils.commom import get_md5
+from ArticleSpider.utils.common import get_md5
 
 
 class JobboleSpider(scrapy.Spider):

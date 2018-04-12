@@ -14,3 +14,6 @@ pip install pillow -i https://pypi.douban.com/simple/
 pip install mysqlclient -i https://pypi.douban.com/simple/
 
 django scrapy item
+
+
+pip install requests -i https://pypi.douban.com/simple/
