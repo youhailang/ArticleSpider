@@ -19,8 +19,14 @@ django scrapy item
 pip install requests -i https://pypi.douban.com/simple/
 倒立文字识别
 zheye
+pip install -i https://pypi.douban.com/simple/ -r E:\PyEnv\requirements.txt
 https://github.com/muchrooms/zheye
 selenium
 pip install -i https://pypi.douban.com/simple/ selenium
 
+# 离线安装python资源
+https://pypi.python.org/pypi
+
 http://selenium-python.readthedocs.io/installation.html
+# c++ 环境
+http://landinghub.visualstudio.com/visual-cpp-build-tools

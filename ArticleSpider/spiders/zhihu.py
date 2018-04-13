@@ -8,7 +8,7 @@ except:
   from urllib import parse
 import scrapy
 from scrapy.loader import ItemLoader
-import common
+import utils.common
 
 
 class ZhihuSpider(scrapy.Spider):

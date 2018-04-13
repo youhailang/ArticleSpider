@@ -79,9 +79,9 @@ class JobBoleArticleItem(scrapy.Item):
       values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
       """
     params = (
-      item['title'], item['create_date'], item['url'], item['url_object_id'], item['front_image_url'],
-      item['front_image_path'], item['comment_nums'], item['fav_nums'], item['praise_nums'], item['tags'],
-      item['content'])
+      self['title'], self['create_date'], self['url'], self['url_object_id'], self['front_image_url'],
+      self['front_image_path'], self['comment_nums'], self['fav_nums'], self['praise_nums'], self['tags'],
+      self['content'])
     return insert_sql, params
 
 

@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-__author__ = 'bobby'
-
 import requests
+
+from utils import common
 
 try:
   import cookielib
@@ -9,7 +8,6 @@ except:
   import http.cookiejar as cookielib
 
 import re
-import common
 
 session = requests.session()
 session.cookies = cookielib.LWPCookieJar(filename="cookies.txt")
