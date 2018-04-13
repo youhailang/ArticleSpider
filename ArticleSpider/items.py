@@ -8,14 +8,15 @@ import datetime
 import re
 
 import scrapy
-from ArticleSpider.utils.common import extract_num
 from scrapy.loader import ItemLoader
 from scrapy.loader.processors import TakeFirst, MapCompose, Join
 
-from ArticleSpider.settings import SQL_DATETIME_FORMAT
-
+from settings import SQL_DATETIME_FORMAT
 
 # 时间转换
+from utils.common import cutils
+
+
 def date_convert(value):
   try:
     create_date = datetime.datetime.strptime(value, "%Y/%m/%d").date()
@@ -113,8 +114,8 @@ class ZhihuQuestionItem(scrapy.Item):
     url = self["url"][0]
     title = "".join(self["title"])
     content = "".join(self["content"])
-    answer_num = extract_num("".join(self.get("answer_num", [])))
-    comments_num = extract_num("".join(self.get("comments_num", [])))
+    answer_num = cutils.extract_num("".join(self.get("answer_num", [])))
+    comments_num = cutils.extract_num("".join(self.get("comments_num", [])))
     v_watch_user_num = self.get("watch_user_num", [])
     if len(v_watch_user_num) == 2:
       watch_user_num = int(v_watch_user_num[0])

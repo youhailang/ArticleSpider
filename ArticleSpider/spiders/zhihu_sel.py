@@ -6,6 +6,7 @@ import re
 from scrapy import Selector
 
 from items import ZhihuQuestionItem, ZhihuAnswerItem
+from utils import common
 
 try:
   import urlparse as parse
@@ -13,7 +14,7 @@ except:
   from urllib import parse
 import scrapy
 from scrapy.loader import ItemLoader
-from utils import common
+from utils.common import cutils
 
 
 class ZhihuSelSpider(scrapy.Spider):
@@ -120,10 +121,10 @@ class ZhihuSelSpider(scrapy.Spider):
 
   def start_requests(self):
     from selenium import webdriver
-    browser = webdriver.Chrome(executable_path=common.chromedriver)
+    browser = webdriver.Chrome(executable_path=cutils.chrome_driver)
     browser.get("https://www.zhihu.com/signin")
-    browser.find_element_by_css_selector('form input[name="username"]').send_keys(common.zhihu_user)
-    browser.find_element_by_css_selector('form input[name="password"]').send_keys(common.zhihu_pass)
+    browser.find_element_by_css_selector('form input[name="username"]').send_keys(cutils.zhihu_user)
+    browser.find_element_by_css_selector('form input[name="password"]').send_keys(cutils.zhihu_pass)
     t_selector = Selector(text=browser.page_source)
     """
     隐藏验证码
@@ -141,10 +142,7 @@ class ZhihuSelSpider(scrapy.Spider):
     cookies = {}
     import pickle
     for cookie in v_cookies:
-      path = os.path.join(common.cookiepath, 'zhihu')
-      if not os.path.exists(path):
-        os.makedirs(path)
-      with open(os.path.join(path, cookie['name']), "wb") as f:
+      with open(os.path.join(cutils.create_tmp_dir('zhihu')[0], cookie['name']), "wb") as f:
         pickle.dump(cookie, f)
         cookies[cookie['name']] = cookie['value']
     browser.close()

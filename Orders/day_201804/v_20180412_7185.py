@@ -6,7 +6,7 @@ black_value = 1
 white_value = 2
 # 默认 黑色棋子 白色棋子
 pieces = [' ', chr(0x2591), chr(0x2593)]
-size = 27
+size = 4
 directions = {
   'e': lambda i, j: (i, j + 1),
   'w': lambda i, j: (i, j - 1),

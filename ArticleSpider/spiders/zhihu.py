@@ -3,6 +3,7 @@ import json
 import re
 
 from utils import common
+from utils.common import cutils
 
 try:
   import urlparse as parse
@@ -127,8 +128,8 @@ class ZhihuSpider(scrapy.Spider):
     if xsrf:
       post_data = {
         "_xsrf": xsrf,
-        "phone_num": common.zhihu_user,
-        "password": common.zhihu_pass,
+        "phone_num": cutils.zhihu_user,
+        "password": cutils.zhihu_pass,
         "captcha": "",
       }
       import time

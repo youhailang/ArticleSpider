@@ -5,8 +5,8 @@ from urllib import parse
 import scrapy
 from scrapy import Request
 
-from ArticleSpider.items import JobBoleArticleItem, ArticleItemLoader
-from ArticleSpider.utils.common import get_md5
+from items import JobBoleArticleItem, ArticleItemLoader
+from utils.common import cutils
 
 
 class JobboleSpider(scrapy.Spider):
@@ -60,7 +60,7 @@ class JobboleSpider(scrapy.Spider):
     front_image_url = response.meta.get("front_image_url", "")  # 文章封面图
     item_loader.add_css("title", ".entry-header h1::text")
     item_loader.add_value("url", response.url)
-    item_loader.add_value("url_object_id", get_md5(response.url))
+    item_loader.add_value("url_object_id", cutils.get_md5(response.url))
     item_loader.add_css("create_date", "p.entry-meta-hide-on-mobile::text")
     item_loader.add_value("front_image_url", [front_image_url])
     item_loader.add_css("praise_nums", ".vote-post-up h10::text")

@@ -2,12 +2,12 @@ from scrapy.selector import Selector
 from selenium import webdriver
 import time
 
-from utils import common
+from utils.common import cutils
 
-browser = webdriver.Chrome(executable_path=common.chromedriver)
+browser = webdriver.Chrome(executable_path=cutils.chrome_driver)
 browser.get("https://www.zhihu.com/signin")
-browser.find_element_by_css_selector('form input[name="username"]').send_keys(common.zhihu_user)
-browser.find_element_by_css_selector('form input[name="password"]').send_keys(common.zhihu_pass)
+browser.find_element_by_css_selector('form input[name="username"]').send_keys(cutils.zhihu_user)
+browser.find_element_by_css_selector('form input[name="password"]').send_keys(cutils.zhihu_pass)
 t_selector = Selector(text=browser.page_source)
 
 """

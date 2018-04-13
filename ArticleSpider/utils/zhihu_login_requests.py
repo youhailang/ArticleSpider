@@ -1,6 +1,6 @@
 import requests
 
-from utils import common
+from utils.common import cutils
 
 try:
   import cookielib
@@ -97,6 +97,6 @@ def zhihu_login(account, password):
   session.cookies.save()
 
 
-zhihu_login(common.zhihu_user, common.zhihu_pass)
+zhihu_login(cutils.zhihu_user, cutils.zhihu_pass)
 # get_index()
 print(is_login())
