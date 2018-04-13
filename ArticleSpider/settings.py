@@ -33,7 +33,7 @@ ROBOTSTXT_OBEY = False
 # CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-# COOKIES_ENABLED = False
+COOKIES_ENABLED = True
 
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
@@ -67,7 +67,7 @@ ROBOTSTXT_OBEY = False
 ITEM_PIPELINES = {
   'ArticleSpider.pipelines.ArticlespiderPipeline': 300,
   # 'scrapy.pipelines.images.ImagesPipeline': 1,
-  'ArticleSpider.pipelines.ArticlesImagePipeline': 1,
+  # 'ArticleSpider.pipelines.ArticlesImagePipeline': 1,
   # 'ArticleSpider.pipelines.JsonWithEncodingPipeline': 2,
   # 'ArticleSpider.pipelines.JsonExporterPipleline': 2,
   # 'ArticleSpider.pipelines.MysqlPipeline': 3,
@@ -106,4 +106,3 @@ MYSQL_PASS = "123456"
 
 SQL_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 SQL_DATE_FORMAT = "%Y-%m-%d"
-

@@ -113,14 +113,14 @@ class ZhihuQuestionItem(scrapy.Item):
     url = self["url"][0]
     title = "".join(self["title"])
     content = "".join(self["content"])
-    answer_num = extract_num("".join(self["answer_num"]))
-    comments_num = extract_num("".join(self["comments_num"]))
-
-    if len(self["watch_user_num"]) == 2:
-      watch_user_num = int(self["watch_user_num"][0])
-      click_num = int(self["watch_user_num"][1])
+    answer_num = extract_num("".join(self.get("answer_num", [])))
+    comments_num = extract_num("".join(self.get("comments_num", [])))
+    v_watch_user_num = self.get("watch_user_num", [])
+    if len(v_watch_user_num) == 2:
+      watch_user_num = int(v_watch_user_num[0])
+      click_num = int(v_watch_user_num[1])
     else:
-      watch_user_num = int(self["watch_user_num"][0])
+      watch_user_num = 0
       click_num = 0
 
     crawl_time = datetime.datetime.now().strftime(SQL_DATETIME_FORMAT)

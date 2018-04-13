@@ -11,6 +11,8 @@ with open(os.path.join(os.environ['USERPROFILE'], "ArticleSpider.txt")) as f:
   f.close()
 zhihu_user = config.get('zhihu.user', '')
 zhihu_pass = config.get('zhihu.password', '')
+chromedriver = config.get('chromedriver', '')
+cookiepath = config.get('cookiepath', '')
 
 def get_md5(url):
   if isinstance(url, str):
@@ -31,4 +33,4 @@ def extract_num(text):
 
 
 if __name__ == "__main__":
-  print(config)
+  print(cookiepath)

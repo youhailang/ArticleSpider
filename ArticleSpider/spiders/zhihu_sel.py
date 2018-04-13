@@ -1,8 +1,11 @@
 import datetime
 import json
+import os
 import re
 
-from utils import common
+from scrapy import Selector
+
+from items import ZhihuQuestionItem, ZhihuAnswerItem
 
 try:
   import urlparse as parse
@@ -10,10 +13,11 @@ except:
   from urllib import parse
 import scrapy
 from scrapy.loader import ItemLoader
+from utils import common
 
 
-class ZhihuSpider(scrapy.Spider):
-  name = "zhihu"
+class ZhihuSelSpider(scrapy.Spider):
+  name = "zhihu_sel"
   allowed_domains = ["www.zhihu.com"]
   start_urls = ['https://www.zhihu.com/']
 
@@ -115,53 +119,34 @@ class ZhihuSpider(scrapy.Spider):
       yield scrapy.Request(next_url, headers=self.headers, callback=self.parse_answer)
 
   def start_requests(self):
-    return [scrapy.Request('https://www.zhihu.com/#signin', headers=self.headers, callback=self.login)]
-
-  def login(self, response):
-    response_text = response.text
-    match_obj = re.match('.*name="_xsrf" value="(.*?)"', response_text, re.DOTALL)
-    xsrf = ''
-    if match_obj:
-      xsrf = (match_obj.group(1))
-
-    if xsrf:
-      post_data = {
-        "_xsrf": xsrf,
-        "phone_num": common.zhihu_user,
-        "password": common.zhihu_pass,
-        "captcha": "",
-      }
+    from selenium import webdriver
+    browser = webdriver.Chrome(executable_path=common.chromedriver)
+    browser.get("https://www.zhihu.com/signin")
+    browser.find_element_by_css_selector('form input[name="username"]').send_keys(common.zhihu_user)
+    browser.find_element_by_css_selector('form input[name="password"]').send_keys(common.zhihu_pass)
+    t_selector = Selector(text=browser.page_source)
+    """
+    隐藏验证码
+    width:0px;height:0px;opacity:0;overflow:hidden;margin:0px;padding:0px;border:0px;
+    """
+    captcha_style = t_selector.css("form div.Captcha::attr(style)").extract()[0]
+    if 'overflow:hidden;' not in captcha_style:
+      print("10s -> 请输入验证码并提交")
       import time
-      t = str(int(time.time() * 1000))
-      captcha_url = "https://www.zhihu.com/captcha.gif?r={0}&type=login".format(t)
-      yield scrapy.Request(captcha_url, headers=self.headers, meta={'post_data': post_data},
-                           callback=self.login_after_captcha)
-
-  def login_after_captcha(self, response):
-    with open("captcha.jpg", "wb") as f:
-      f.write(t.content)
-      f.close()
-    from PIL import Image
-    try:
-      im = Image.open("captcha.jpg")
-      im.show()
-      im.close()
-    except:
-      pass
-    captcha = input("请输入验证码\n>")
-    post_data = response.meta.get("post_data", {})
-    post_url = "https://www.zhihu.com/login/phone_num"
-    post_data["captcha"] = captcha
-    return [scrapy.FormRequest(
-      url=post_url,
-      formdata=post_data,
-      headers=self.headers,
-      callback=self.check_login
-    )]
-
-  def check_login(self, response):
-    # 验证服务器的返回数据判断是否成功
-    text_json = json.loads(response.text)
-    if "msg" in text_json and text_json["msg"] == "登录成功":
-      for url in self.start_urls:
-        yield scrapy.Request(url, dont_filter=True, headers=self.headers)
+      time.sleep(10)
+    else:
+      browser.find_element_by_css_selector('form button.SignFlow-submitButton').click()
+    v_cookies = browser.get_cookies()
+    print("cookies -> %s" % str(v_cookies))
+    cookies = {}
+    import pickle
+    for cookie in v_cookies:
+      path = os.path.join(common.cookiepath, 'zhihu')
+      if not os.path.exists(path):
+        os.makedirs(path)
+      with open(os.path.join(path, cookie['name']), "wb") as f:
+        pickle.dump(cookie, f)
+        cookies[cookie['name']] = cookie['value']
+    browser.close()
+    for url in self.start_urls:
+      yield scrapy.Request(url, dont_filter=True, cookies=cookies, headers=self.headers, callback=self.parse)

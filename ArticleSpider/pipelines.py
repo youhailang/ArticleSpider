@@ -115,7 +115,7 @@ class MysqlTwistedPipeline(object):
     query.addErrback(self.handle_error)  # 处理异步异常
     return item
 
-  def handle_error(self, failure, item, spider):
+  def handle_error(self, failure):
     # 处理异步插入异常
     print(failure)
 

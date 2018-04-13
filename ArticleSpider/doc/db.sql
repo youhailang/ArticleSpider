@@ -13,7 +13,7 @@ CREATE TABLE `jobbole_article` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `zhihu_question` (
-  `zhihu_id` bit(1) NOT NULL,
+  `zhihu_id` bigint(20) NOT NULL,
   `topics` varchar(255) DEFAULT NULL,
   `url` varchar(300) NOT NULL,
   `title` varchar(200) NOT NULL,
