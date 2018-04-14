@@ -3,6 +3,7 @@ import json
 import os
 import re
 
+import requests
 from scrapy import Selector
 
 from items import ZhihuQuestionItem, ZhihuAnswerItem
@@ -110,40 +111,21 @@ class ZhihuSelSpider(scrapy.Spider):
       yield scrapy.Request(next_url, headers=self.headers, callback=self.parse_answer)
 
   def start_requests(self):
-    from selenium import webdriver
-    browser = webdriver.Chrome(executable_path=cutils.chrome_driver)
-    browser.get("https://www.zhihu.com/signin")
-    browser.find_element_by_css_selector('form input[name="username"]').send_keys(cutils.zhihu_user)
-    browser.find_element_by_css_selector('form input[name="password"]').send_keys(cutils.zhihu_pass)
-    t_selector = Selector(text=browser.page_source)
-    """
-    隐藏验证码
-    width:0px;height:0px;opacity:0;overflow:hidden;margin:0px;padding:0px;border:0px;
-    """
-    captcha_style = t_selector.css("form div.Captcha::attr(style)").extract()[0]
-    if 'overflow:hidden;' not in captcha_style:
-      print("10s -> 请输入验证码并提交")
-      import time
-      time.sleep(10)
-    else:
-      browser.find_element_by_css_selector('form button.SignFlow-submitButton').click()
-
-    # 等待 z_c0 字段 调用api的时候会用到
-    v_cookies = browser.get_cookies()
-    print("wait for z_c0")
-    while 'z_c0' not in [c['name'] for c in v_cookies]:
-      v_cookies = browser.get_cookies()
-      print("*" * 30)
-      import time
-      time.sleep(1)
-
-    cookies = {}
-    import pickle
-    for cookie in v_cookies:
-      with open(os.path.join(cutils.create_tmp_dir('zhihu')[0], cookie['name']), "wb") as f:
-        print(cookie['name'], cookie['value'])
-        pickle.dump(cookie, f)
-        cookies[cookie['name']] = cookie['value']
-    browser.close()
+    cookies = cutils.zhihu_load_cookies()
+    is_login = False
+    v_flag = "local"
+    if len(cookies) > 0:
+      is_login = requests.get('https://www.zhihu.com/api/v4/questions/269086788', headers=self.headers,
+                              allow_redirects=False, cookies=cookies).status_code == 200
+    if not is_login:
+      v_flag = "login"
+      cookies.clear()
+      for cookie in cutils.zhihu_login_sel(root_path, "z_c0", "_xsrf"):
+        with open(os.path.join(cutils.create_tmp_dir('zhihu')[0], cookie['name']), "wb") as f:
+          pickle.dump(cookie, f)
+          cookies[cookie['name']] = cookie['value']
+    print("load cookie from " + v_flag)
+    for key, value in cookies.items():
+      print(key + "=" + value)
     for url in self.start_urls:
       yield scrapy.Request(url, dont_filter=True, cookies=cookies, headers=self.headers, callback=self.parse)

@@ -88,7 +88,15 @@ def function_test():
   print(partial(lambda a, b: a + b, 99)(1))
 
 
+def combine():
+  a = list([1, 2, 3, 3, 3])
+  b = list([2, 3, 4, 4, 4, 4])
+  print(set(a).intersection(set(b)))
+  print(set(b) - set(a).intersection(set(b)))
+
+
 if __name__ == "__main__":
   # normal_test()
   # collection_test()
-  function_test()
+  # function_test()
+  combine()
