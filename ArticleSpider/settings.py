@@ -10,6 +10,8 @@
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 import os
 
+from common import cutils
+
 BOT_NAME = 'ArticleSpider'
 
 SPIDER_MODULES = ['ArticleSpider.spiders']
@@ -75,8 +77,7 @@ ITEM_PIPELINES = {
 }
 
 IMAGES_URLS_FIELD = "front_image_url"
-project_home = os.path.dirname(os.path.abspath(__file__))
-IMAGES_STORE = os.path.join(project_home, "images")
+IMAGES_STORE = cutils.image_path
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

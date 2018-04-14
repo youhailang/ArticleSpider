@@ -19,6 +19,15 @@ if 'overflow:hidden;' not in captcha:
   print("等待验证码输入")
   time.sleep(10)
 browser.find_element_by_css_selector('form button.SignFlow-submitButton').click()
+
+# 等待 z_c0 返回
 cookies = browser.get_cookies()
-print(cookies)
+print("wait")
+while 'z_c0' not in [cookie['name'] for cookie in cookies]:
+  cookies = browser.get_cookies()
+  print("*" * 30)
+  time.sleep(1)
+for cookie in cookies:
+  print(cookie['name'], cookie['value'])
+
 browser.quit()

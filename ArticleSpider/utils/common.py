@@ -17,7 +17,8 @@ class CommonUtils(object):
     self.chrome_driver = self.config.get('chromedriver', '')
     self.project_home = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     self.tmp_dir = self.config.get('tmpdir', os.path.join(os.environ['USERPROFILE'], "tmp"))
-    self.cookie_path = self.config.get('tmpdir', os.path.join(self.tmp_dir, "cookie"))
+    self.cookie_path = self.config.get('cookie_path', os.path.join(self.tmp_dir, "cookie"))
+    self.image_path = self.config.get('image_path', os.path.join(self.tmp_dir, "images"))
 
   # 创建临时文件夹并返回
   def create_tmp_dir(self, *names):

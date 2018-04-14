@@ -6,7 +6,6 @@ import re
 from scrapy import Selector
 
 from items import ZhihuQuestionItem, ZhihuAnswerItem
-from utils import common
 
 try:
   import urlparse as parse
@@ -23,7 +22,7 @@ class ZhihuSelSpider(scrapy.Spider):
   start_urls = ['https://www.zhihu.com/']
 
   # question的第一页answer的请求url
-  start_answer_url = "https://www.zhihu.com/api/v4/questions/{0}/answers?sort_by=default&include=data%5B%2A%5D.is_normal%2Cis_sticky%2Ccollapsed_by%2Csuggest_edit%2Ccomment_count%2Ccollapsed_counts%2Creviewing_comments_count%2Ccan_comment%2Ccontent%2Ceditable_content%2Cvoteup_count%2Creshipment_settings%2Ccomment_permission%2Cmark_infos%2Ccreated_time%2Cupdated_time%2Crelationship.is_author%2Cvoting%2Cis_thanked%2Cis_nothelp%2Cupvoted_followees%3Bdata%5B%2A%5D.author.is_blocking%2Cis_blocked%2Cis_followed%2Cvoteup_count%2Cmessage_thread_token%2Cbadge%5B%3F%28type%3Dbest_answerer%29%5D.topics&limit={1}&offset={2}"
+  start_answer_url = "https://www.zhihu.com/api/v4/questions/{0}/answers?sort_by=default&include=data%5B%2A%5D.is_normal%2Cis_sticky%2Ccollapsed_by%2Csuggest_edit%2Ccomment_count%2Ccollapsed_counts%2Creviewing_comments_count%2Ccan_comment%2Ccontent%2Ceditable_content%2Cvoteup_count%2Creshipment_settings%2Ccomment_permission%2Cmark_infos%2Ccreated_time%2Cupdated_time%2Crelationship.is_author%2Cvoting%2Cis_thanked%2Cis_nothelp%2Cupvoted_followees%3Bdata%5B%2A%5D.author.is_blocking%2Cis_blocked%2Cis_followed%2Cvoteup_count%2Cmessage_thread_token%2Cbadge%5B%3F%28type%3Dbest_answerer%29%5D.topics&offset={1}&limit={2}"
 
   # 请求头
   headers = {
@@ -43,20 +42,18 @@ class ZhihuSelSpider(scrapy.Spider):
       match_obj = re.match("(.*zhihu.com/question/(\d+))(/|$).*", url)
       if match_obj:
         # 如果提取到question相关的页面则下载后交由提取函数进行提取
-        request_url = match_obj.group(1)
-        yield scrapy.Request(request_url, headers=self.headers, callback=self.parse_question)
+        question_url = match_obj.group(1)
+        yield scrapy.Request(question_url, headers=self.headers, callback=self.parse_question)
+        answer_url = self.start_answer_url.format(match_obj.group(2), 0, 20)
+        yield scrapy.Request(answer_url, headers=self.headers, callback=self.parse_answer)
       else:
         # 如果不是question页面则直接进一步跟踪 深度搜索
         yield scrapy.Request(url, headers=self.headers, callback=self.parse)
 
   def parse_question(self, response):
     # 处理question页面， 从页面中提取出具体的question item
+    question_id = int(re.match("(.*zhihu.com/question/(\d+))(/|$).*", response.url).group(2))
     if "QuestionHeader-title" in response.text:
-      # 处理新版本
-      match_obj = re.match("(.*zhihu.com/question/(\d+))(/|$).*", response.url)
-      if match_obj:
-        question_id = int(match_obj.group(2))
-
       item_loader = ItemLoader(item=ZhihuQuestionItem(), response=response)
       item_loader.add_css("title", "h1.QuestionHeader-title::text")
       item_loader.add_css("content", ".QuestionHeader-detail")
@@ -70,10 +67,6 @@ class ZhihuSelSpider(scrapy.Spider):
       question_item = item_loader.load_item()
     else:
       # 处理老版本页面的item提取
-      match_obj = re.match("(.*zhihu.com/question/(\d+))(/|$).*", response.url)
-      if match_obj:
-        question_id = int(match_obj.group(2))
-
       item_loader = ItemLoader(item=ZhihuQuestionItem(), response=response)
       # item_loader.add_css("title", ".zh-question-title h2 a::text")
       item_loader.add_xpath("title",
@@ -89,14 +82,11 @@ class ZhihuSelSpider(scrapy.Spider):
       item_loader.add_css("topics", ".zm-tag-editor-labels a::text")
 
       question_item = item_loader.load_item()
-
-    yield scrapy.Request(self.start_answer_url.format(question_id, 20, 0), headers=self.headers,
-                         callback=self.parse_answer)
     yield question_item
 
-  def parse_answer(self, reponse):
+  def parse_answer(self, response):
     # 处理question的answer
-    ans_json = json.loads(reponse.text)
+    ans_json = json.loads(response.text)
     is_end = ans_json["paging"]["is_end"]
     next_url = ans_json["paging"]["next"]
 
@@ -137,12 +127,21 @@ class ZhihuSelSpider(scrapy.Spider):
       time.sleep(10)
     else:
       browser.find_element_by_css_selector('form button.SignFlow-submitButton').click()
+
+    # 等待 z_c0 字段 调用api的时候会用到
     v_cookies = browser.get_cookies()
-    print("cookies -> %s" % str(v_cookies))
+    print("wait for z_c0")
+    while 'z_c0' not in [c['name'] for c in v_cookies]:
+      v_cookies = browser.get_cookies()
+      print("*" * 30)
+      import time
+      time.sleep(1)
+
     cookies = {}
     import pickle
     for cookie in v_cookies:
       with open(os.path.join(cutils.create_tmp_dir('zhihu')[0], cookie['name']), "wb") as f:
+        print(cookie['name'], cookie['value'])
         pickle.dump(cookie, f)
         cookies[cookie['name']] = cookie['value']
     browser.close()
