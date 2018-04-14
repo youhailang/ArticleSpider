@@ -7,4 +7,5 @@ print(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # 启动
 # execute(["scrapy", "crawl", "jobbole"])
-execute(["scrapy", "crawl", "zhihu_sel"])
+# execute(["scrapy", "crawl", "zhihu_sel"])
+execute(["scrapy", "crawl", "lagou"])

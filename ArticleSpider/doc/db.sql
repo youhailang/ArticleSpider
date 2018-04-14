@@ -25,9 +25,9 @@ CREATE TABLE `zhihu_question` (
   `watch_user_num` int(11) NOT NULL,
   `click_num` int(11) NOT NULL,
   `crawl_time` datetime NOT NULL,
+  `crawl_update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`zhihu_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 CREATE TABLE `zhihu_answer` (
   `zhihu_id` bigint(20) NOT NULL,
@@ -35,13 +35,11 @@ CREATE TABLE `zhihu_answer` (
   `question_id` bigint(20) NOT NULL,
   `author_id` varchar(100) DEFAULT NULL,
   `content` longtext NOT NULL,
-  `praise_num` int(11) NOT NULL,
+  `parise_num` int(11) NOT NULL,
   `comments_num` int(11) NOT NULL,
   `create_time` datetime NOT NULL,
   `update_time` datetime NOT NULL,
   `crawl_time` datetime NOT NULL,
-  `crawl_update_time` datetime NOT NULL,
+  `crawl_update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`zhihu_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-

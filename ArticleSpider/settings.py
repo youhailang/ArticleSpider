@@ -54,9 +54,11 @@ COOKIES_ENABLED = True
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-# DOWNLOADER_MIDDLEWARES = {
-#    'ArticleSpider.middlewares.ArticlespiderDownloaderMiddleware': 543,
-# }
+DOWNLOADER_MIDDLEWARES = {
+  'ArticleSpider.middlewares.RandomUserAgentMiddlware': 543,
+  # 取消系统默认的user-agent
+  'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
@@ -78,7 +80,8 @@ ITEM_PIPELINES = {
 
 IMAGES_URLS_FIELD = "front_image_url"
 IMAGES_STORE = cutils.image_path
-
+USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0'
+RANDOM_UA_TYPE = 'random'
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 # AUTOTHROTTLE_ENABLED = True

@@ -5,6 +5,7 @@
 # See documentation in:
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
+from fake_useragent import UserAgent
 from scrapy import signals
 
 
@@ -101,3 +102,21 @@ class ArticlespiderDownloaderMiddleware(object):
 
   def spider_opened(self, spider):
     spider.logger.info('Spider opened: %s' % spider.name)
+
+
+class RandomUserAgentMiddlware(object):
+  # 随机更换user-agent
+  def __init__(self, crawler):
+    super(RandomUserAgentMiddlware, self).__init__()
+    # 获取的时候需要翻墙访问 https://www.w3schools.com/browsers/default.asp
+    # 之后会从本地获取缓存的ua文件
+    self.ua = UserAgent()
+    self.ua_type = crawler.settings.get("RANDOM_UA_TYPE", 'random')
+
+  @classmethod
+  def from_crawler(cls, crawler):
+    return cls(crawler)
+
+  def process_request(self, request, spider):
+    ua = getattr(self.ua, self.ua_type)
+    request.headers.setdefault('User-Agent', ua)

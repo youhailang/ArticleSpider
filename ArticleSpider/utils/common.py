@@ -4,6 +4,7 @@ import re
 
 
 class CommonUtils(object):
+
   def __init__(self, name='ArticleSpider.txt'):
     self.config = {}
     with open(os.path.join(os.environ['USERPROFILE'], name)) as f:
@@ -19,6 +20,7 @@ class CommonUtils(object):
     self.tmp_dir = self.config.get('tmpdir', os.path.join(os.environ['USERPROFILE'], "tmp"))
     self.cookie_path = self.config.get('cookie_path', os.path.join(self.tmp_dir, "cookie"))
     self.image_path = self.config.get('image_path', os.path.join(self.tmp_dir, "images"))
+    # self.ua_list =
 
   # 创建临时文件夹并返回
   def create_tmp_dir(self, *names):
@@ -99,6 +101,8 @@ class CommonUtils(object):
           cookie = pickle.load(f)
           cookies[cookie['name']] = cookie['value']
     return cookies
+
+
 
 
 cutils = CommonUtils()
