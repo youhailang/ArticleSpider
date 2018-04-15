@@ -7,6 +7,9 @@
 
 from fake_useragent import UserAgent
 from scrapy import signals
+from scrapy.http import HtmlResponse
+
+from common import cutils
 
 
 class ArticlespiderSpiderMiddleware(object):
@@ -120,3 +123,22 @@ class RandomUserAgentMiddlware(object):
   def process_request(self, request, spider):
     ua = getattr(self.ua, self.ua_type)
     request.headers.setdefault('User-Agent', ua)
+
+
+from selenium import webdriver
+
+
+class JSPageMiddleware(object):
+  def __init__(self):
+    self.browser = webdriver.Chrome(executable_path=cutils.chrome_driver)
+    super(JSPageMiddleware, self).__init__()
+
+  # 通过chrome 请求动态网页
+  def process_request(self, request, spider):
+    if spider.name == "jobbole":
+      import time
+      self.browser.get(request.url)
+      time.sleep(3)
+      print("访问 : {0}".format(request.url))
+      # 提前返回response 则不会进入 download
+      return HtmlResponse(url=self.browser.current_url, body=self.browser.page_source, encoding="utf-8", request=request)

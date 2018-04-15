@@ -56,6 +56,7 @@ COOKIES_ENABLED = True
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
   'ArticleSpider.middlewares.RandomUserAgentMiddlware': 543,
+  'ArticleSpider.middlewares.JSPageMiddleware': 1,
   # 取消系统默认的user-agent
   'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 }
