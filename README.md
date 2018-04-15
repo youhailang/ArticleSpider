@@ -30,3 +30,5 @@ https://pypi.python.org/pypi
 http://selenium-python.readthedocs.io/installation.html
 # c++ 环境
 http://landinghub.visualstudio.com/visual-cpp-build-tools
+# 无界面运行chrome
+pip install PyVirtualDisplay

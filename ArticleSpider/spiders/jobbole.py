@@ -4,15 +4,27 @@ from urllib import parse
 
 import scrapy
 from scrapy import Request
-
+from selenium import webdriver
+from scrapy.xlib.pydispatch import dispatcher
 from items import JobBoleArticleItem, ArticleItemLoader
 from utils.common import cutils
+from scrapy import signals
 
 
 class JobboleSpider(scrapy.Spider):
   name = 'jobbole'
   allowed_domains = ['blog.jobbole.com']
   start_urls = ['http://blog.jobbole.com/all-posts/']
+
+  def __init__(self):
+    self.browser = webdriver.Chrome(executable_path=cutils.chrome_driver)
+    super(JobboleSpider, self).__init__()
+    dispatcher.connect(self.spider_closed, signals.spider_closed)
+
+  def spider_closed(self):
+    # 使用信号量在退出spider的时候关闭chrome
+    print("spider closed")
+    self.browser.quit()
 
   def parse_by_xpath(self, response):
     # 标题
