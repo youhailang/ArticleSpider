@@ -100,3 +100,6 @@ if __name__ == "__main__":
   # collection_test()
   # function_test()
   combine()
+  names = "1,2,3".split(",")
+  print(tuple([name for name in names]))
+
